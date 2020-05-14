@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 /*
 Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
 
@@ -14,6 +16,7 @@ Input: "cbbd"
 Output: "bb"
 */
 
+// solution 1
 func longestPalindrome(s string) (result string) {
 	sLen := len(s)
 	if sLen <= 1 {
@@ -22,12 +25,12 @@ func longestPalindrome(s string) (result string) {
 
 	charList := []byte(s)
 	for i := 0; i < sLen; i++ {
-		if subString := getLongestPalindromeBaseOnIndex(charList, i, i, sLen); len(subString) > len(result){
+		if subString := getLongestPalindromeBaseOnIndex(charList, i, i, sLen); len(subString) > len(result) {
 			result = subString
 		}
 
-		if (i + 1) < sLen{
-			if subString := getLongestPalindromeBaseOnIndex(charList, i, i+1, sLen); len(subString) > len(result){
+		if (i + 1) < sLen {
+			if subString := getLongestPalindromeBaseOnIndex(charList, i, i+1, sLen); len(subString) > len(result) {
 				result = subString
 			}
 		}
@@ -46,53 +49,56 @@ func getLongestPalindromeBaseOnIndex(charList []byte, left, right, sLen int) str
 		right += 1
 	}
 
-	return string(charList[left+1:right])
+	return string(charList[left+1 : right])
 }
 
-func longestPalindrome1(s string) (result string) {
+// solution 2
+func longestPalindrome2(s string) (result string) {
 	sLen := len(s)
 	if sLen <= 1 {
 		return s
 	}
-
 	palindromeCache := make([][]bool, sLen)
 	for i := 0; i < sLen; i++ {
 		palindromeCache[i] = make([]bool, sLen)
-		palindromeCache[i][i] = true
 	}
 
 	charList := []byte(s)
-	for i := sLen - 1; i >= 0; i-- {
-		for j := 0; j < i; j++ {
-			if isPalindrome(charList, i, j, palindromeCache) == true {
-				if len(result) <= (j - i + 1) {
-					result = string(charList[i : j+1])
+	for i := 0; i < sLen; i++ {
+		for j := 0; j <= i; j++ {
+			if charList[i] == charList[j] &&
+				(i == j || j+1 == i || j+2 == i || palindromeCache[i-1][j+1]) {
+				palindromeCache[i][j] = true
+
+				if (i + 1 - j) > len(result) {
+					result = string(charList[j : i+1])
 				}
+				continue
 			}
+
+			palindromeCache[i][j] = false
 		}
 	}
-
 	return result
 }
 
-func isPalindrome(charList []byte, start, end int, palindromeCache [][]bool) bool {
-	if start == end {
-		return true
-	}
-
-	palindromeCache[start][end] = false
-	if charList[start] == charList[end] && palindromeCache[start+1][end-1] == true {
-		palindromeCache[start][end] = true
-	}
-
-	return palindromeCache[start][end]
-
-}
+// test case
 func main() {
-	if !(longestPalindrome("babad") == "bab" || longestPalindrome("babad") == "aba") {
-		panic("not expected result")
+	result := longestPalindrome("babad")
+	if result != "aba" && result != "bab" {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
 	}
-	if !(longestPalindrome("cbbd") == "bb") {
-		panic("not expected result")
+	result = longestPalindrome("cbbd")
+	if result != "bb" {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
 	}
+	result = longestPalindrome2("babad")
+	if result != "aba" && result != "bab" {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
+	}
+	result = longestPalindrome2("cbbd")
+	if result != "bb" {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
+	}
+	fmt.Println("test case passed!")
 }
