@@ -61,6 +61,32 @@ func jump(nums []int) int {
 	return numberOfJumps[0]
 }
 
+func jumpSolutionII(nums []int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	topPosition := len(nums) - 1
+	numberOfJump := 0
+
+	lastJumpMaxReachPosition := 0
+	curJumpMaxReachPosition := 0
+	for i := 0; curJumpMaxReachPosition < topPosition; {
+		numberOfJump++
+		for ; i <= lastJumpMaxReachPosition && curJumpMaxReachPosition < topPosition; i++ {
+			if (nums[i] + i) > curJumpMaxReachPosition {
+				curJumpMaxReachPosition = nums[i] + i
+			}
+		}
+		if lastJumpMaxReachPosition == curJumpMaxReachPosition {
+			return UnReachable
+		}
+		lastJumpMaxReachPosition = curJumpMaxReachPosition
+	}
+
+	return numberOfJump
+}
+
 // test case
 func main() {
 	result := jump([]int{2, 3, 1, 1, 4})
@@ -69,6 +95,16 @@ func main() {
 	}
 
 	result = jump([]int{1})
+	if result != 0 {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
+	}
+
+	result = jumpSolutionII([]int{2, 3, 1, 1, 4})
+	if result != 2 {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
+	}
+
+	result = jumpSolutionII([]int{1})
 	if result != 0 {
 		panic(fmt.Sprintf("test case fail, result: %+v", result))
 	}
