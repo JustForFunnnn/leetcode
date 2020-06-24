@@ -43,9 +43,49 @@ func largestRectangleArea(heights []int) (maxRectangle int) {
 	return maxRectangle
 }
 
+// solution II
+func largestRectangleAreaII(heights []int) (maxRectangle int) {
+	if len(heights) == 0 {
+		return 0
+	}
+
+	heights = append(heights, 0)
+
+	stack := make([]int, len(heights))
+	stackLen := 0
+
+	for i, height := range heights {
+
+		for ; stackLen != 0 && heights[stack[stackLen-1]] > height; {
+			currentHeight := heights[stack[stackLen-1]]
+			stackLen--
+
+			rightBound := i
+			leftBound := -1
+			if stackLen > 0 {
+				leftBound = stack[stackLen-1]
+			}
+			rectangle := currentHeight * (rightBound - leftBound - 1)
+			if rectangle > maxRectangle {
+				maxRectangle = rectangle
+			}
+		}
+
+		stack[stackLen] = i
+		stackLen++
+	}
+
+	return maxRectangle
+}
+
 // test case
 func main() {
 	result := largestRectangleArea([]int{2, 1, 5, 6, 2, 3})
+	if reflect.DeepEqual(result, 10) != true {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
+	}
+
+	result = largestRectangleAreaII([]int{2, 1, 5, 6, 2, 3})
 	if reflect.DeepEqual(result, 10) != true {
 		panic(fmt.Sprintf("test case fail, result: %+v", result))
 	}
