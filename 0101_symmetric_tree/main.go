@@ -52,11 +52,11 @@ func mirrorTree(root *TreeNode) (newTree *TreeNode) {
 }
 
 func equalTree(treeA, treeB *TreeNode) bool {
-	if treeA == nil && treeB == nil{
+	if treeA == nil && treeB == nil {
 		return true
 	}
 
-	if treeA == nil || treeB == nil{
+	if treeA == nil || treeB == nil {
 		return false
 	}
 
@@ -65,4 +65,63 @@ func equalTree(treeA, treeB *TreeNode) bool {
 	}
 
 	return equalTree(treeA.Left, treeB.Left) && equalTree(treeA.Right, treeB.Right)
+}
+
+type TreeNodeQueue struct {
+	queue []*TreeNode
+}
+
+func (t *TreeNodeQueue) Append(n *TreeNode) {
+	t.queue = append(t.queue, n)
+}
+
+func (t *TreeNodeQueue) PopFront() *TreeNode {
+	if t.Len() == 0 {
+		return nil
+	}
+	n := t.queue[0]
+	t.queue = t.queue[1:]
+	return n
+}
+
+func (t *TreeNodeQueue) Len() int {
+	return len(t.queue)
+}
+
+func isSymmetricII(root *TreeNode) bool {
+	if root == nil {
+		return true
+	}
+
+	queueA := TreeNodeQueue{}
+	queueB := TreeNodeQueue{}
+
+	queueA.Append(root.Left)
+	queueB.Append(root.Right)
+
+	for ; queueA.Len() != 0 && queueB.Len() != 0; {
+		nodeA := queueA.PopFront()
+		nodeB := queueB.PopFront()
+
+		if nodeA == nil && nodeB == nil {
+			continue
+		}
+
+		if nodeA == nil || nodeB == nil {
+			return false
+		}
+
+		if nodeA.Val != nodeB.Val {
+			return false
+		}
+
+		queueA.Append(nodeA.Left)
+		queueB.Append(nodeB.Right)
+
+		queueA.Append(nodeA.Right)
+		queueB.Append(nodeB.Left)
+
+	}
+
+	return queueA.Len() == 0 && queueB.Len() == 0
 }
