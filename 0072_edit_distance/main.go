@@ -80,6 +80,43 @@ func minDistanceHelper(word1 string, word1Idx int, word2 string, word2Idx int, m
 	return mem[word1Idx][word2Idx]
 }
 
+func minDistanceII(word1 string, word2 string) (min int) {
+	// minStep[i][j] means the mini distance from word1[0:i+1] become word2[0:j+1]
+	minStep := make([][]int, len(word1)+1)
+	for i := range minStep {
+		minStep[i] = make([]int, len(word2)+1)
+	}
+
+	for i := 0; i <= len(word1); i++ {
+		minStep[i][0] = i
+	}
+
+	for j := 0; j <= len(word2); j++ {
+		minStep[0][j] = j
+	}
+
+	for i := 0; i <= len(word1); i++ {
+		for j := 0; j <= len(word2); j++ {
+			if i == 0 || j == 0 {
+				continue
+			}
+			if word1[i-1] == word2[j-1] {
+				minStep[i][j] = minStep[i-1][j-1]
+			} else {
+				minStep[i][j] = minStep[i-1][j-1] + 1
+				if minStep[i][j-1]+1 < minStep[i][j] {
+					minStep[i][j] = minStep[i][j-1] + 1
+				}
+				if minStep[i-1][j]+1 < minStep[i][j] {
+					minStep[i][j] = minStep[i-1][j] + 1
+				}
+			}
+		}
+	}
+
+	return minStep[len(word1)][len(word2)]
+}
+
 // test case
 func main() {
 	result := minDistance("horse", "ros")
@@ -88,6 +125,16 @@ func main() {
 	}
 
 	result = minDistance("intention", "execution")
+	if reflect.DeepEqual(result, 5) != true {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
+	}
+
+	result = minDistanceII("horse", "ros")
+	if reflect.DeepEqual(result, 3) != true {
+		panic(fmt.Sprintf("test case fail, result: %+v", result))
+	}
+
+	result = minDistanceII("intention", "execution")
 	if reflect.DeepEqual(result, 5) != true {
 		panic(fmt.Sprintf("test case fail, result: %+v", result))
 	}
